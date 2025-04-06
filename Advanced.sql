@@ -59,3 +59,79 @@ VALUES ('Kinnari', 'Bhalerao', 'Interstellar');
 
 
 -- Temp tables can be used only for a single session
+
+-- Stored procedures
+DELIMITER $$
+CREATE PROCEDURE large_salaries2()
+BEGIN
+	SELECT *
+	FROM parks_and_recreation.employee_salary
+	WHERE salary >= 50000;
+	SELECT *
+	FROM parks_and_recreation.employee_salary
+	WHERE salary >= 20000;
+END $$
+DELIMITER ;
+
+CALL large_salaries2();
+
+DELIMITER $$
+CREATE PROCEDURE large_salaries5(p_employee_id int)
+BEGIN
+	SELECT salary
+    FROM employee_salary
+    WHERE employee_id = p_employee_id;
+END $$
+DELIMITER ;
+
+CALL large_salaries5(1);
+
+-- Trigger is a block of code that executed automatically when an event takes place in a specific table
+
+select *
+from parks_and_recreation.employee_salary;
+
+DELIMITER $$
+CREATE TRIGGER employee_insert12
+	AFTER INSERT ON employee_salary
+    FOR EACH ROW 
+BEGIN 
+INSERT INTO employee_demographics(employee_id, first_name, last_name)
+VALUES (NEW.employee_id, NEW.first_name, NEW.last_name);
+END $$
+DELIMITER $$
+
+INSERT INTO employee_salary(employee_od, first_name, last_name, occupation, salary, dept_id)
+VALUES(13, 'Kinnari', 'Bhalerao', 'Astrophysicist', 100000, NULL);
+
+DELIMITER $$
+CREATE TRIGGER employee_insert
+	AFTER INSERT ON employee_salary
+    FOR EACH ROW 
+BEGIN 
+INSERT INTO employee_demographics(employee_id, first_name, last_name)
+VALUES (NEW.employee_id, NEW.first_name, NEW.last_name);
+END $$
+DELIMITER $$
+
+INSERT INTO employee_salary(employee_id, first_name, last_name, occupation, salary, dept_id)
+VALUES(15, 'Kinnari', 'Bhalerao', 'Astrophysicist', 100000, NULL);
+
+-- EVENTS
+
+SELECT *
+FROM employee_demographics;
+
+DELIMITER $$
+CREATE EVENT delete_retirees2
+ON SCHEDULE EVERY 30 SECOND
+DO
+BEGIN 
+	DELETE 
+    FROM employee_demographics
+    WHERE age >= 60;
+END $$
+DELIMITER ;
+
+SELECT *
+FROM employee_demographics;
